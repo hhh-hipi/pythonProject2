@@ -4,7 +4,7 @@ from datetime import datetime
 
 class TestLogin:
     def setup_class(self):
-        self.d = u2.connect("192.168.31.232:40375")
+        self.d = u2.connect("")
         
     def handle_popups(self):
         # 处理各种可能的弹窗按钮
