@@ -1,6 +1,7 @@
 import time
 import uiautomator2 as u2
 from datetime import datetime
+import logging
 
 class TestLogin:
     def setup_class(self):
@@ -33,7 +34,7 @@ class TestLogin:
             while time.time() - start_time < 10:
                 self.handle_popups()
                 time.sleep(1)
-            print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 启动完成，弹窗处理结束")
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 启动完成，弹窗处理结束")
             
             # 点击首页的"我的"按钮
             if self.d.xpath('//*[@resource-id="android:id/tabs"]/android.widget.FrameLayout[5]/android.widget.ImageView[1]').exists:
@@ -70,7 +71,7 @@ class TestLogin:
                 code_input.set_text("")
                 code_input.set_text("123456")
             else:
-                print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 未找到验证码输入框")
+                logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 未找到验证码输入框")
                 return
             
             # 等待登录完成
@@ -78,10 +79,10 @@ class TestLogin:
             
             # 验证登录结果
             assert self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/nickname"]').exists, "登录失败"
-            print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 登录成功！")
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 登录成功！")
             
         finally:
             # 清理数据
-            print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 开始清除应用数据...")
-            self.d.app_clear("com.xmcy.hykb")
-            print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 应用数据已清除")
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 开始清除应用数据...")
+            #self.d.app_clear("com.xmcy.hykb")
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 应用数据已清除")
