@@ -223,6 +223,8 @@ class TestCloud:
                     # 使用系统返回按钮退出
                     self.d.press("back")
                     time.sleep(1)
+                    self.d.press("back")
+                    time.sleep(1)
                     self.d(resourceId="com.hykb.yuanshenmap:id/cloud_game_dialog_right_tv").click()
                     logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 游戏已退出")
                 else:
@@ -293,5 +295,18 @@ class TestCloud:
         finally:
             # 清理数据
             logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 开始清除应用数据...")
-            self.d.app_clear("com.xmcy.hykb")
-            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 应用数据已清除")
+            try:
+                # 先停止应用
+                self.d.app_stop("com.xmcy.hykb")
+                time.sleep(2)
+                # 尝试清除数据
+                self.d.app_clear("com.xmcy.hykb")
+                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 应用数据已清除")
+            except Exception as e:
+                logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 清除应用数据失败: {str(e)}")
+                # 尝试使用 shell 命令清除
+                try:
+                    self.d.shell(['pm', 'clear', 'com.xmcy.hykb'])
+                    logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 通过shell命令清除应用数据成功")
+                except Exception as e:
+                    logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] shell命令清除应用数据也失败: {str(e)}")
