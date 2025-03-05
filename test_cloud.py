@@ -24,31 +24,38 @@ class TestCloud:
             self.d.xpath('//*[@text="始终允许"]').click()
         # 处理首页推送弹窗
         if self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/dialog_home_notice_image_close"]').exists:
-            self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/dialog_home_notice_image_close"]').click()
+            self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/dialog_home_notice_image_close"]').click()      
+        if self.d.xpath('//android.widget.FrameLayout[2]').exists:
+            self.d.click(0.905, 0.966)
 
     def test_cloud_game(self):
         try:
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 启动好游快爆")
             self.d.app_start("com.xmcy.hykb")
-            self.d.wait_activity(".main.MainActivity", timeout=10)
-            
+            self.d.wait_activity(".main.MainActivity", timeout=10)    
             # 处理弹窗
             start_time = time.time()
-            while time.time() - start_time < 10:
+            while time.time() - start_time < 30:
                 self.handle_popups()
                 time.sleep(1)
             logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 启动完成，弹窗处理结束")
             
             # 点击首页的"我的"按钮
+            time.sleep(3)  # 增加等待时间，确保页面完全加载
             if self.d.xpath('//*[@resource-id="android:id/tabs"]/android.widget.FrameLayout[5]/android.widget.ImageView[1]').exists:
                 self.d.xpath('//*[@resource-id="android:id/tabs"]/android.widget.FrameLayout[5]/android.widget.ImageView[1]').click()
-            else:
+            elif self.d(text="我的").exists:
                 self.d(text="我的").click()
+            else:
+                # 如果都找不到，尝试通过坐标点击（根据实际坐标调整）
+                self.d.click(0.9, 0.95)
+                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 通过坐标点击'我的'按钮")
                 
             time.sleep(1)
             # 点击登录/注册按钮
             self.d(text="登录/注册").click()
             time.sleep(1)
-
+            
             # 选择泰国地区号码登录
             self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/login_area_tv"]').click()
             self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/area_phone_recycler"]/android.widget.FrameLayout[8]').click()
@@ -100,14 +107,53 @@ class TestCloud:
             if self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').exists:
                 self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()               
             # 等待插件加载并启动游戏
-            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=30):
-                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载成功，开始启动游戏...")
+            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=60):
+                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载成功")
+                # 重启应用
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 重启快爆应用...")
+            self.d.app_stop("com.xmcy.hykb")
+            time.sleep(1)
+            self.d.app_start("com.xmcy.hykb")
+            self.d.wait_activity(".main.MainActivity", timeout=10)           
+            # 处理弹窗
+            start_time = time.time()
+            while time.time() - start_time < 30:
+                self.handle_popups()
+                time.sleep(1)
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 重启完成，弹窗处理结束")
+            # 点击首页的"我的"按钮
+            time.sleep(3)  # 增加等待时间，确保页面完全加载
+            if self.d.xpath('//*[@resource-id="android:id/tabs"]/android.widget.FrameLayout[5]/android.widget.ImageView[1]').exists:
+                self.d.xpath('//*[@resource-id="android:id/tabs"]/android.widget.FrameLayout[5]/android.widget.ImageView[1]').click()
+            elif self.d(text="我的").exists:
+                self.d(text="我的").click()
+            else:
+                # 如果都找不到，尝试通过坐标点击（根据实际坐标调整）
+                self.d.click(0.9, 0.95)
+                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 通过坐标点击'我的'按钮")
+
+            # 点击进入我的收藏
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 点击进入我的收藏...")
+            self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/core_function_view"]/androidx.recyclerview.widget.RecyclerView[1]/android.view.ViewGroup[3]/android.widget.ImageView[1]').click()
+            time.sleep(2)
+            # 启动手游《原神》s6_8
+            logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 开始启动手游《原神》s6_8...")
+            self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/item_collect_game_union_rlview"]/android.widget.LinearLayout[5]/android.widget.RelativeLayout[1]/android.widget.FrameLayout[1]').click()
+            time.sleep(2)
+            #处理可能遇到的温馨提示弹窗
+            if self.d(resourceId="com.xmcy.hykb:id/left_button").exists:
+                 self.d(resourceId="com.xmcy.hykb:id/left_button").click()
+            if self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').exists:
+                self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()               
+            # 等待插件加载并启动游戏
+            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=60):
+                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件更新成功，开始启动游戏...")
                 #点击开始云玩
                 time.sleep(2)
                 self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/cloud_game_start_tv"]').click()
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 点击开始云玩")
                 # 检查是否进入云玩成功
-                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=30):
+                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=60):
                     logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 成功进入云玩")
                     time.sleep(2)
                     # 使用系统返回按钮退出
@@ -134,14 +180,14 @@ class TestCloud:
             if self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').exists:
                 self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()               
             # 等待插件加载并启动游戏
-            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=30):
+            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=60):
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载成功，开始启动游戏...")
                 #点击开始云玩
                 time.sleep(2)
                 self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/cloud_game_start_tv"]').click()
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 点击开始云玩")
                 # 检查是否进入云玩成功
-                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=30):
+                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=60):
                     logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 成功进入云玩")
                     time.sleep(2)
                     # 使用系统返回按钮退出
@@ -164,16 +210,16 @@ class TestCloud:
             if self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').exists:
                 self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()               
             # 等待插件加载并启动游戏
-            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=30):
+            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=60):
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载成功，开始启动游戏...")
                 #点击开始云玩
                 time.sleep(2)
                 self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/cloud_game_start_tv"]').click()
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 点击开始云玩")
                 # 检查是否进入云玩成功
-                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=30):
+                if self.d(resourceId="com.hykb.yuanshenmap:id/tv_download_btw").exists(timeout=60):
                     logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 成功进入云玩")
-                    time.sleep(2)
+                    time.sleep(3)
                     # 使用系统返回按钮退出
                     self.d.press("back")
                     time.sleep(1)
@@ -194,14 +240,14 @@ class TestCloud:
             if self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').exists:
                 self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()               
             # 等待插件加载并启动游戏
-            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=30):
+            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=60):
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载成功，开始启动游戏...")
                 #点击开始云玩
                 time.sleep(2)
                 self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/cloud_game_start_tv"]').click()
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 点击开始云玩")
                 # 检查是否进入云玩成功
-                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=30):
+                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=60):
                     logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 成功进入云玩")
                     time.sleep(2)
                     # 使用系统返回按钮退出
@@ -224,14 +270,14 @@ class TestCloud:
             if self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').exists:
                 self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()                
             # 等待插件加载并启动游戏
-            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=30):
+            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").exists(timeout=60):
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载成功，开始启动游戏...")
                 #点击开始云玩
                 time.sleep(2)
                 self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/cloud_game_start_tv"]').click()
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 点击开始云玩")
                 # 检查是否进入云玩成功
-                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=30):
+                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").exists(timeout=60):
                     logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 成功进入云玩")
                     time.sleep(2)
                     # 使用系统返回按钮退出
