@@ -2,11 +2,13 @@ import time
 import uiautomator2 as u2
 from datetime import datetime
 import logging
+import os
 
 class TestCloud:
     def setup_class(self):
         self.d = u2.connect("")
-        
+        # 创建截图保存目录
+        os.makedirs("d:\\PycharmProjects\\pythonProject2\\error_screenshots", exist_ok=True)
     def handle_popups(self):
         # 处理各种可能的弹窗按钮
         buttons = ["同意，进入使用","允许", "同意", "我知道了", "跳过", "关闭"]
@@ -114,6 +116,9 @@ class TestCloud:
                     self.d(resourceId="com.hykb.yuanshenmap:id/cloud_game_dialog_right_tv").click()
                     logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 游戏已退出")
                 else:
+                    # 添加截图
+                    screenshot_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+                    self.d.screenshot(f"d:\\PycharmProjects\\pythonProject2\\error_screenshots\\cloud_game_fail_{screenshot_time}.png")
                     logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 进入云玩失败")
             else:
                 logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载失败")
@@ -148,7 +153,6 @@ class TestCloud:
                     logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 进入云玩失败")
             else:
                 logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载失败")
-
                 # 启动手游《王者荣耀》s7_8
             time.sleep(2)
             logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 开始动手游《王者荣耀》s7_8...")
@@ -179,7 +183,6 @@ class TestCloud:
                     logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 进入云玩失败")
             else:
                 logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载失败")
-
                 # 启动页游《黄金矿工-页游》s4_1
             time.sleep(2)
             logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 开始启动页游《黄金矿工-页游》s4_1...")
@@ -210,8 +213,7 @@ class TestCloud:
                     logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 进入云玩失败")
             else:
                 logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载失败")
-
-            # 启动端游《骑马与砍杀》s4_20
+                # 启动端游《骑马与砍杀》s4_20
             time.sleep(2)
             logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 开始动端游《骑马与砍杀》s4_20...")
             self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/item_collect_game_union_rlview"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.FrameLayout[1]').click()
