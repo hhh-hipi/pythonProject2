@@ -49,6 +49,7 @@ class TestLogin:
 
             # 选择泰国地区号码登录
             self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/login_area_tv"]').click()
+            time.sleep(2)
             self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/area_phone_recycler"]/android.widget.FrameLayout[8]').click()
             time.sleep(2)
             # 输入固定手机号
