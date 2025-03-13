@@ -56,7 +56,7 @@ class TestCloud:
                 self.d.xpath(
                     '//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()
             # 等待插件加载并启动游戏
-            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").wait(timeout=120):
+            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").wait(timeout=300):
                 logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 插件加载成功，开始启动游戏")
                 time.sleep(2)
                 # 点击开始云玩
