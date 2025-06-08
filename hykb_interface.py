@@ -66,7 +66,7 @@ class HykbUtils:
                     # 输入固定手机号
                     phone_input = self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/phone_input_login_et_phone_number"]')
                     phone_input.set_text("")
-                    phone_input.set_text("383938391060")
+                    phone_input.set_text("383938391010")
                     time.sleep(3)
                     # 点击获取验证码按钮
                     self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/tv_get_verification_code"]').click()
@@ -116,57 +116,37 @@ class HykbUtils:
             logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 点击云玩启动按钮...")
             game_element.click()
             time.sleep(2)
+            # 处理可能遇到的上号助手弹窗
+            if self.d(resourceId="com.xmcy.hykb:id/top_bg").exists:
+                self.d(text="不登录，先进游戏").click()
+            time.sleep(2)
             # 处理可能遇到的温馨提示弹窗
             if self.d(resourceId="com.xmcy.hykb:id/left_button").exists:
                 self.d(resourceId="com.xmcy.hykb:id/left_button").click()
             if self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').exists:
                 self.d.xpath('//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()
-            # 等待插件加载并启动游戏
-            if self.d(resourceId="com.xmcy.hykb:id/cloud_game_start_tv").wait(timeout=300):
-                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 云玩插件加载成功，开始启动游戏")
-                # 点击开始云玩
-                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 点击开始云玩")
+            # 等待插件加载并启动游戏，检测云玩顶部带宽延迟元素/边玩边下按钮判断是否进入云玩成功
+
+            # 检测边玩边下按钮/云玩顶部带宽延迟元素判断是否进入云玩成功
+            if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").wait(timeout=300):
+                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 成功进入云玩")
+                time.sleep(2)
+                # 使用系统返回按钮退出
+                self.d.press("back")
                 time.sleep(1)
-                self.d.xpath('//*[@resource-id="com.xmcy.hykb:id/cloud_game_start_tv"]').click()
-                # 处理可能遇到的温馨提示弹窗
-                if self.d(resourceId="com.xmcy.hykb:id/left_button").exists:
-                    self.d(resourceId="com.xmcy.hykb:id/left_button").click()
-                if self.d.xpath(
-                        '//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').exists:
-                    self.d.xpath(
-                        '//*[@resource-id="android:id/content"]/android.widget.LinearLayout[1]/android.widget.LinearLayout[3]').click()
-                # 检测云玩顶部带宽延迟元素/边玩边下按钮判断是否进入云玩成功
-                if self.d(resourceId="com.hykb.yuanshenmap:id/ping_view").wait(timeout=180):
-                    logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 成功进入云玩")
-                    time.sleep(2)
-                    # 使用系统返回按钮退出
-                    self.d.press("back")
-                    time.sleep(1)
+                if self.d(resourceId="com.hykb.yuanshenmap:id/cloud_game_dialog_right_tv").exists:
                     self.d(resourceId="com.hykb.yuanshenmap:id/cloud_game_dialog_right_tv").click()
-                    logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 云玩游戏已退出")
-                    return True
-                elif self.d(resourceId="com.hykb.yuanshenmap:id/tv_download_btw").wait(timeout=300):
-                    logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 成功进入云玩")
-                    time.sleep(2)
-                    # 使用2次系统返回按钮退出
-                    self.d.press("back")
-                    time.sleep(1)
-                    self.d.press("back")
-                    time.sleep(1)
-                    self.d(resourceId="com.hykb.yuanshenmap:id/cloud_game_dialog_right_tv").click()
-                    logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 云玩游戏已退出")
-                    return True
                 else:
-                    # 添加截图
-                    screenshot_time = datetime.now().strftime('%Y%m%d_%H%M%S')
-                    self.d.screenshot(f"error_screenshots/cloud_game_fail_{screenshot_time}进入云玩失败.png")
-                    logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 进入云玩失败")
-                    return False
+                    self.d.press("back")
+                    if self.d(resourceId="com.hykb.yuanshenmap:id/cloud_game_dialog_right_tv").exists:
+                        self.d(resourceId="com.hykb.yuanshenmap:id/cloud_game_dialog_right_tv").click()
+                logging.info(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 云玩游戏已退出")
+                return True
             else:
                 # 添加截图
                 screenshot_time = datetime.now().strftime('%Y%m%d_%H%M%S')
-                self.d.screenshot(f"error_screenshots/cloud_game_fail_{screenshot_time}云玩插件加载失败.png")
-                logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 云玩插件加载失败")
+                self.d.screenshot(f"error_screenshots/cloud_game_fail_{screenshot_time}进入云玩失败.png")
+                logging.error(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 进入云玩失败")
                 return False
                 
         except Exception as e:
